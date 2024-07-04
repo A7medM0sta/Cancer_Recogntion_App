@@ -161,7 +161,36 @@ def add_predictions(input_data):
     st.write(
         "This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
+# def create_model(data):
+#     X = data.drop(['diagnosis'], axis=1)
+#     y = data['diagnosis']
+#     scalar = StandardScaler()
+#     X = scalar.fit_transform(X)
+#
+#     # Split the data
+#     X_train, X_test, y_train, y_test = train_test_split(X, y,
+#                                                         test_size=0.2, shuffle=True,
+#                                                         random_state=42)
+#     model = LogisticRegression()
+#     model.fit(X_train, y_train)
+#
+#     # Test the model
+#     y_pred = model.predict(X_test)
+#     return y_test, y_pred
+# def plot_confusion_matrix():
+#     y_true, y_pred = create_model(data)
+#     # Generate confusion matrix
+#     matrix = confusion_matrix(y_true, y_pred)
+#
+#     # Create a heatmap
+#     fig = ff.create_annotated_heatmap(z=matrix, x=["Predicted Benign", "Predicted Malignant"],
+#                                       y=["Actual Benign", "Actual Malignant"], colorscale="Viridis")
+#
+#     # Add titles and labels
+#     fig.update_layout(title="Confusion Matrix", xaxis=dict(title="Predicted Label"), yaxis=dict(title="True Label"))
+#     fig.show()
 
+    # return fig
 def main():
     st.set_page_config(
         page_title="Breast Cancer Predictor",
