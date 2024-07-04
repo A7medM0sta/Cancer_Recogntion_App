@@ -4,6 +4,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+import pickle5 as pickle
+import os
 
 def get_clean_data():
     data = pd.read_csv('./data/data.csv')
@@ -48,5 +50,17 @@ def main():
 
     # Evaluate the model
     # evaluate(model)
+    model_dir = 'model'
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    with open(os.path.join(model_dir, 'model.pkl'), 'wb') as f:
+        pickle.dump(model, f)
+
+    with open(os.path.join(model_dir, 'scalar.pkl'), "wb") as f:
+        pickle.dump(scalar, f)
+
+
+
 if __name__== '__main__':
     main()
