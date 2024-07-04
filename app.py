@@ -161,6 +161,73 @@ def add_predictions(input_data):
     st.write(
         "This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
+# def create_model(data):
+#     X = data.drop(['diagnosis'], axis=1)
+#     y = data['diagnosis']
+#     scalar = StandardScaler()
+#     X = scalar.fit_transform(X)
+#
+#     # Split the data
+#     X_train, X_test, y_train, y_test = train_test_split(X, y,
+#                                                         test_size=0.2, shuffle=True,
+#                                                         random_state=42)
+#     model = LogisticRegression()
+#     model.fit(X_train, y_train)
+#
+#     # Test the model
+#     y_pred = model.predict(X_test)
+#     return y_test, y_pred
+# def plot_confusion_matrix():
+#     y_true, y_pred = create_model(data)
+#     # Generate confusion matrix
+#     matrix = confusion_matrix(y_true, y_pred)
+#
+#     # Create a heatmap
+#     fig = ff.create_annotated_heatmap(z=matrix, x=["Predicted Benign", "Predicted Malignant"],
+#                                       y=["Actual Benign", "Actual Malignant"], colorscale="Viridis")
+#
+#     # Add titles and labels
+#     fig.update_layout(title="Confusion Matrix", xaxis=dict(title="Predicted Label"), yaxis=dict(title="True Label"))
+#     fig.show()
+
+    # return fig
+def get_feature_importance_chart(model, feature_names):
+    # Extract coefficients from the logistic regression model
+    importance = model.coef_[0]
+
+    # Create a bar chart
+    fig = go.Figure([go.Bar(x=feature_names, y=importance, marker_color='blue')])
+
+    fig.update_layout(
+        title='Feature Importance in Predicting Breast Cancer',
+        xaxis_title='Features',
+        yaxis_title='Coefficient Value',
+        template='plotly_white'
+    )
+
+    return fig
+
+def plot_feature_comparison(data, feature_x, feature_y):
+    # Filter data by diagnosis
+    benign_data = data[data['diagnosis'] == 0]
+    malignant_data = data[data['diagnosis'] == 1]
+
+    # Create scatter plot
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=benign_data[feature_x], y=benign_data[feature_y],
+                             mode='markers', name='Benign',
+                             marker=dict(color='green')))
+    fig.add_trace(go.Scatter(x=malignant_data[feature_x], y=malignant_data[feature_y],
+                             mode='markers', name='Malignant',
+                             marker=dict(color='red')))
+
+    # Add titles and labels
+    fig.update_layout(title=f'{feature_x} vs {feature_y} by Diagnosis',
+                      xaxis_title=feature_x,
+                      yaxis_title=feature_y,
+                      legend_title='Diagnosis')
+
+    return fig
 
 def main():
     st.set_page_config(
@@ -174,6 +241,7 @@ def main():
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
     input_data = add_sidebar()
+    data = get_clean_data()  # Ensure you have this line to load the data
 
     with st.container():
         st.title("Breast Cancer Predictor")
@@ -185,9 +253,20 @@ def main():
     with col1:
         radar_chart = get_radar_chart(input_data)
         st.plotly_chart(radar_chart)
+
+        # Load the model and scaler
+        model = pickle.load(open("model/model.pkl", "rb"))
+        # Assuming the feature names are the same as the input dictionary keys
+        feature_names = list(input_data.keys())
+        feature_importance_chart = get_feature_importance_chart(model, feature_names)
+        st.plotly_chart(feature_importance_chart)
+
+        # Plot feature comparison
+        feature_comparison_chart = plot_feature_comparison(data, 'radius_mean', 'texture_mean')
+        st.plotly_chart(feature_comparison_chart)
+
     with col2:
         add_predictions(input_data)
-
 
 if __name__ == '__main__':
     main()
